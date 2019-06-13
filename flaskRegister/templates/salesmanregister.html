@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form id="registerForm" action="" method="post">
+        <legend> 欢迎注册 </legend>
+        <fieldset class="form-group">
+            <div class="form-group">
+                <select id="province" name="province" class="form-control " >
+                    <option value="">请选择省</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="city" name="city" class="form-control " >
+                    <option value="">请选择市</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="district" name="district" class="form-control " >
+                    <option value="">请选择区/县</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="endpoint" name="endpoint" placeholder=" 请输入终端名称" >
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="name" name="name" placeholder=" 请输入姓名" >
+            </div>
+            <div class="form-group form-row">
+                <div class="col-7 ">
+                    <input type="text" class="form-control" id="phonenumber" name="phonenumber" placeholder=" 请输入手机号" >
+                </div>
+
+                <div class="col-5 ">
+                    <button id="sendshortmessage" name="sendshortmessage" type="button" class="btn btn-primary ">发送验证码</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="validcode" name="validcode" placeholder=" 请输入验证码" >
+            </div>
+            <div class="form-group">
+                <select id="gender" name="gender" class="form-control " >
+                    <option value="">请选择性别</option>
+                    <option value="1">女</option>
+                    <option value="2">男</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="weichatid" name="weichatid" placeholder=" 请输入微信号">
+            </div>
+        </fieldset>
+            <div>
+                <button id="submitbutton" name="submitbutton" type="button" class="btn btn-block" >提交</button>
+            </div>
+    </form>
+    <!-- Button trigger modal -->
+     <!-- Modal -->
+    <div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">注册成功</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            欢迎您，好记星家人
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="closemodal" class="btn btn-primary" data-dismiss="modal">关闭</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+{% block script %}
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/jquery.validate.min.js"></script>
+    <script src="../static/js/additional-methods.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script>
+    $(function() {
+        var submitresult = {{ submit_result }};
+        console.log(submitresult);
+        if (submitresult == 100){
+            submitresult = 0;
+            $('#welcomeModal').modal('show');
+        }if (submitresult == 200){
+            submitresult = 0;
+            alert('注册失败，请联系管理员');
+        }
+
+        var timewait = 60;
+        function countdown() {
+            if (timewait == 0){
+                $('#sendshortmessage').attr({disabled: false});
+                $('#sendshortmessage').html('发送验证码');
+                clearTimeout(countdown);
+                timewait = 60;
+            }
+            else{
+                $('#sendshortmessage').attr({disabled: true});
+                $('#sendshortmessage').html(timewait + ' 秒...  ');
+                timewait -- ;
+                setTimeout(countdown, 1000);
+            }
+        }
+
+         var phone_number;
+         var invalid_phone = false;
+        $('#sendshortmessage').click(function () {
+            phone_number = $('#phonenumber').val();
+            if (phone_number == ''){
+                $('#phonenumber').addClass("is-invalid");
+                $('.col-7').append("<div class=\"invalid-feedback\">&ensp;请输入手机号</div>");
+
+            }
+            else{
+                $('#phonenumber').removeClass("is-invalid");
+                $('.col-7 .invalid-feedback').remove();
+                if (invalid_phone == false){
+                    var url = "{{ url_for('validcode') }}";
+                    $.get(url, {phone:phone_number});
+                    countdown();
+                }
+            }
+        });
+
+        $('#phonenumber').click(function () {
+            $('#phonenumber').removeClass("is-invalid");
+            $('.col-7 .invalid-feedback').remove();
+            $('#sendshortmessage').attr({disabled: false});
+        });
+
+        $("#province").ready(function () {
+            $.get({{ url_for('provinces')}}).done(function (data) {
+                var option_html = "";
+                $.each(data, function (idx, obj) {
+                    option_html = option_html + "<option value=\"" + obj.id + "\">" + obj.name + "</option>";
+                    $('#province').html(option_html);
+                });
+            });
+        });
+
+        $("#province").change(function () {
+            var p_id = $('#province option:selected').val();
+            $.get({{ url_for('regions')}}, {province: p_id}).done(function (data) {
+                var option_html = "";
+                $.each(data, function (idx, obj) {
+                    option_html = option_html + "<option value=\"" + obj.id + "\">" + obj.name + "</option>";
+                    $('#city').html(option_html);
+                });
+            });
+        });
+
+        $("#city").change(function () {
+            var c_id = $('#city option:selected').val();
+            $.get({{ url_for('regions')}}, {city: c_id}).done(function (data) {
+                var option_html = "";
+                $.each(data, function (idx, obj) {
+                    option_html = option_html + "<option value=\"" + obj.id + "\">" + obj.name + "</option>";
+                    $('#district').html(option_html);
+                });
+            });
+        });
+
+
+        var validator = $('#registerForm').validate({
+            rules:{
+            province:"required",
+            city:"required",
+            district:"required",
+            endpoint:"required",
+            name:"required",
+            phonenumber:{
+                required:true,
+                phone_check:true
+            },
+            gender:"required",
+            validcode:{
+              required:true,
+              code_valid:true
+            }
+
+          },
+          messages:{
+            province:"请选择省",
+            city:"请选择市",
+            district:"请选择区",
+            endpoint:"请输入终端名称",
+            name:"请输入姓名",
+            phonenumber:{
+                required:"请输入手机号",
+                phone_check:"此手机号已注册"
+            },
+            validcode:{
+              required:"请输入验证码",
+              code_valid:"验证码错误"
+            },
+            gender:"请选择性别"
+          },
+           errorPlacement: function(error, element) {      //错误信息的位置
+            error.appendTo( element.parent() );
+          }
+
+        });
+
+        $.validator.addMethod('code_valid', function (value, element) {
+            var result;
+            var code_str = '/' + value + '/';
+            var url = "{{ url_for('code_validate', code=value)}}".replace('//', code_str);
+            $.ajax({
+                url:url,
+                async: false,
+                type:'get',
+                success:function (data) {
+                    result = data.status;
+                }
+
+            });
+            if (result == '100'){
+                return true
+            }else{
+                return false
+            }
+
+        }, 'code wrong !');
+
+        $.validator.addMethod('phone_check', function (value, element) {
+            var result;
+            var phone_str = '/' + value + '/';
+            var url = "{{ url_for('phone_check', phone=value)}}".replace('//', phone_str);
+            $.ajax({
+                url:url,
+                async: false,
+                type:'get',
+                success:function (data) {
+                    result = data.status;
+                }
+
+            });
+            if (result == '100'){
+                invalid_phone = false;
+                return true
+            }else{
+                console.log('aaaainvalid_phone = ' + invalid_phone);
+                invalid_phone = true;
+                return false
+            }
+
+        }, 'phone number duplicated !');
+
+    $("#submitbutton").click(function(){
+            $('.col-7 .invalid-feedback').remove();
+            $('#registerForm').submit();
+
+        })
+    });
+    </script>
+{% endblock %}
