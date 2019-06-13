@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from flask import render_template, redirect, url_for, flash, jsonify, request, session
-from flaskRegister import app, db
+from flaskRegister import app, db, AMAP_KEY
 from flaskRegister.models import OzingSalesmanUser, Province, City, District
 import requests
 
@@ -111,7 +111,7 @@ def insert_regions():
     db.drop_all(bind='regions')
     db.create_all(bind='regions')
     province_data, city_data, district_data = [], [], []
-    payload = {'subdistrict':3, 'key':'f7f97c6d7fdbb896c3b98c5ff5903e7e'}
+    payload = {'subdistrict': 3, 'key': AMAP_KEY}
     r = requests.get('https://restapi.amap.com/v3/config/district', params=payload)
     result = r.json()
     regions = result['districts'][0]['districts']

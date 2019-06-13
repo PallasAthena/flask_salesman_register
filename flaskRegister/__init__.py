@@ -19,6 +19,7 @@ SSH_PASSWORD = config.get('SSH_PASSWORD')
 SSH_REMOTE_BIND_IP = config.get('SSH_REMOTE_BIND_IP')
 SSH_REMOTE_BIND_PORT = config.get('SSH_REMOTE_BIND_PORT')
 DATABASE_USER_PASS = config.get('DATABASE_USER_PASS')
+AMAP_KEY = config.get('AMAP_KEY')
 
 tunnel = SSHTunnelForwarder(
     (SSH_IP), ssh_username=SSH_USERNAME, ssh_password=SSH_PASSWORD,
