@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+    body {
+      background: #FFA773;
+    }
+    form {
+      width: 90%;
+      margin: 30px auto;
+      background: #efefef;
+      padding: 30px 20px 30px 20px;
+      -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+      box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+    }
+    #submit{
+        background-color: #ff5f00;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+    }
+
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <form id="registerForm" action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <legend> {{ legend }} </legend>
+        <fieldset class="form-group">
+            <div class="form-group">
+{#                {{ form.province.label(class="control-label") }}#}
+                {% if form.province.errors %}
+                    {{ form.province(class='form-control is-invalid') }}
+                    {% for error in form.province.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.province(class='cols-sm-10 form-control') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+{#                {{ form.city.label(class="cols-sm-2 control-label") }}#}
+                {% if form.city.errors %}
+                    {{ form.city(class='form-control is-invalid') }}
+                    {% for error in form.city.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.city(class='form-control') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+{#                {{ form.district.label(class="cols-sm-2 control-label") }}#}
+                {% if form.district.errors %}
+                    {{ form.district(class='form-control is-invalid') }}
+                    {% for error in form.district.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.district(class='form-control') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+{#                {{ form.endpoint.label(class="cols-sm-2 control-label") }}#}
+                {% if form.endpoint.errors %}
+                    {{ form.endpoint(class='form-control is-invalid') }}
+                    {% for error in form.endpoint.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.endpoint(class='form-control', placeholder="请输入终端名称") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+{#                {{ form.name.label(class="cols-sm-2 control-label") }}#}
+                {% if form.name.errors %}
+                    {{ form.name(class='form-control is-invalid') }}
+                    {% for error in form.name.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.name(class='form-control', placeholder="请输入姓名") }}
+                {% endif %}
+            </div>
+            <div class="form-group form-row" >
+                <div class="col-7">
+                    {% if form.phonenumber.errors %}
+                        {{ form.phonenumber(class='form-control is-invalid') }}
+                        {% for error in form.phonenumber.errors %}
+                            <div class="invalid-feedback">
+                                 <span>{{ error }}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        {{ form.phonenumber(class='form-control', placeholder="请输入手机号码") }}
+                    {% endif %}
+                </div>
+                <div class="col-5 ">
+                    <button type="button" class="btn btn-primary" id="sendcode" name="sendcode">发送验证码</button>
+                </div>
+            </div>
+            <div class="form-group">
+{#                {{ form.phonenumber.label(class="cols-sm-2 control-label") }}#}
+                {% if form.validcode.errors %}
+                    {{ form.validcode(class='form-control is-invalid') }}
+                    {% for error in form.validcode.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.validcode(class='form-control', placeholder="请输入验证码") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+{#                {{ form.gender.label(class="cols-sm-2 control-label") }}#}
+                {% if form.gender.errors %}
+                    {{ form.gender(class='form-control is-invalid') }}
+                    {% for error in form.gender.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.gender(class='form-control') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+{#                {{ form.weichat_id.label(class="cols-sm-2 control-label") }}#}
+                {% if form.weichat_id.errors %}
+                    {{ form.weichat_id(class='form-control is-invalid') }}
+                    {% for error in form.weichat_id.errors %}
+                        <div class="invalid-feedback">
+                             <span>{{ error }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {{ form.weichat_id(class='form-control', placeholder="请输入微信号") }}
+                {% endif %}
+            </div>
+        </fieldset>
+            <div >
+                {{ form.submit(class='btn btn-block') }}
+            </div>
+        <p class="h6 d-none">请核对注册信息，有异常请联系 biqiao@hjx.com</p>
+    </form>
+
+
+
+
+
+{% endblock %}
+{% block script %}
+    <script>
+    $(function () {
+
+        if ($('legend').text() == ' 注册成功，欢迎您 ') {
+            $('.col-5').hide();
+            $('#submit').hide();
+            $('#validcode').hide();
+            $('#province').attr({readonly: true});
+            $('#city').attr({readonly: true});
+            $('#district').attr({readonly: true});
+            $('#endpoint').attr({readonly: true});
+            $('#name').attr({readonly: true});
+            $('#phonenumber').attr({readonly: true});
+            $('#gender').attr({readonly: true});
+            $('p').removeClass('d-none');
+            $('legend').css("color", "#ff5f00");
+            if ($('#weichat_id').val() == ' '){
+                console.log('dd'+ $('#weichat_id').val() + 'bb');
+                $('#weichat_id').hide();
+
+            }else{
+                $('#weichat_id').attr({readonly: true});
+            }
+
+        }
+
+
+        if ($('#province').val() > 0){
+            var city_id = $('#city').val();
+            var district_id = $('#district').val();
+
+            if(city_id > 0 && district_id == 0){
+                $('#city').attr({disabled:false});
+                setRegions($('#province').val(), 'province');
+                setRegions(city_id, 'city');
+                $('#city option[value=city_id]').attr({selected:true});
+            }
+            else if(city_id == 0 && district_id == 0){
+                $('#city').attr({disabled:false});
+                setRegions($('#province').val(), 'province');
+            }
+        }else{
+            $('#city').attr({disabled:true});
+            $('#district').attr({disabled:true});
+        }
+
+
+        $('#province').change(function () {
+            var p_id = $('#province').val();
+            if(p_id != 0){
+                setRegions(p_id, 'province');
+            }
+
+        });
+
+        $('#city').change(function () {
+            var c_id = $('#city').val();
+            if (c_id != 0){
+                setRegions(c_id, 'city');
+            }
+
+        });
+
+        function setRegions(region_id, region_type) {
+            var send_data = {};
+            send_data[region_type] = region_id;
+            var received_json;
+            $.getJSON({{ url_for('regions') }}, send_data, function (data) {
+                if (region_type == 'province'){
+                    $('#city').attr({disabled:false});
+                    $('#city').empty();
+
+                    data.forEach(function (item) {
+                        $('#city').append($('<option>', {value: item['id'], text:item['name']}));
+                    });
+                }
+
+                if (region_type == 'city'){
+                    $('#district').attr({disabled:false});
+                    $('#district').empty();
+
+                    data.forEach(function (item) {
+                        $('#district').append($('<option>', {value: item['id'], text:item['name']}));
+                    });
+                }
+
+            });
+        }
+
+        $('#sendcode').click(function () {
+            var phonenumber = $('#phonenumber').val();
+            $('#validcode').empty();
+            if (phonenumber == ''){
+                $('#phonenumber').addClass("is-invalid");
+                $('.col-7').append("<div class=\"invalid-feedback\">&ensp;请输入手机号</div>");
+
+            }
+            else{
+                $('#phonenumber').removeClass("is-invalid");
+                $('#phonenumber .invalid-feedback').remove();
+
+                var url = "{{ url_for('validcode') }}";
+                $.get(url, {phone:phonenumber}, function (data) {
+                    console.log('datadata' + data);
+                    console.log('data——code' + data['code']);
+                    if (data['code'] == 1001){
+                        $('#phonenumber').addClass("is-invalid");
+                        $('.col-7').append("<div class=\"invalid-feedback\">&ensp;此手机号已经注册</div>");
+                    }
+                });
+                countdown();
+
+            }
+
+        });
+
+        $('#phonenumber').click(function () {
+            $('#phonenumber').removeClass("is-invalid");
+            $('fieldset div:eq(7).invalid-feedback').remove();
+            $('#sendcode').attr({disabled: false});
+        });
+
+
+
+        var timewait = 60;
+        function countdown() {
+            if (timewait == 0){
+                $('#sendcode').attr({disabled: false});
+                $('#sendcode').html('发送验证码');
+                clearTimeout(countdown);
+                timewait = 60;
+            }
+            else{
+                $('#sendcode').attr({disabled: true});
+                $('#sendcode').html(timewait + ' 秒...  ');
+                timewait -- ;
+                setTimeout(countdown, 1000);
+            }
+        }
+
+
+    })
+
+    </script>
+
+{% endblock %}
+

@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sshtunnel import SSHTunnelForwarder
-import os
 import json
 
 app = Flask(__name__)

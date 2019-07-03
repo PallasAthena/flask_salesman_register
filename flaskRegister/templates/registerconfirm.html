@@ -4,25 +4,77 @@
     body {
       background: #FFA773;
     }
-    p {
-      width: 70%;
+    form {
+      width: 90%;
       margin: 30px auto;
       background: #efefef;
-      padding: 60px 20px 60px 20px;
+      padding: 30px 20px 30px 20px;
       -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
       box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
     }
-
+    #submit{
+        background-color: #ff5f00;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+    }
 
 
     </style>
 {% endblock %}
 
 {% block content %}
-    <p id="welcome" >
-        <span>好记星家人，欢迎你</span>
+    <form id="registerForm" action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <legend> 注册成功, 欢迎你好记星家人</legend>
+        <fieldset class="form-group">
+            <div class="form-group">
+                    {{ form.province(class='form-control is-invalid') }}
+                    {{ form.province(class='cols-sm-10 form-control') }}
+            </div>
+            <div class="form-group">
+                    {{ form.city(class='form-control is-invalid') }}
+                    {{ form.city(class='form-control') }}
 
-    </p>
+            </div>
+            <div class="form-group">
+                    {{ form.district(class='form-control is-invalid') }}
+                    {{ form.district(class='form-control') }}
+
+            </div>
+            <div class="form-group">
+                    {{ form.endpoint(class='form-control is-invalid') }}
+                    {{ form.endpoint(class='form-control') }}
+            </div>
+            <div class="form-group">
+                    {{ form.name(class='form-control is-invalid') }}
+                    {{ form.name(class='form-control') }}
+            </div>
+            <div class="form-group form-row" >
+                <div class="col-7">
+                        {{ form.phonenumber(class='form-control is-invalid') }}
+                        {{ form.phonenumber(class='form-control') }}
+                </div>
+            </div>
+            <div class="form-group">
+                    {{ form.gender(class='form-control is-invalid') }}
+                    {{ form.gender(class='form-control') }}
+            </div>
+            <div class="form-group">
+                    {{ form.weichat_id(class='form-control is-invalid') }}
+                    {{ form.weichat_id(class='form-control') }}
+
+            </div>
+        </fieldset>
+
+    </form>
+
+     <!-- Modal -->
 
 
 {% endblock %}
+
+
+{% endblock %}
+

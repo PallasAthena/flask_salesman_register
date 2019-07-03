@@ -1,54 +1,63 @@
 #!/usr/bin/python3
+import requests
 from flask import render_template, redirect, url_for, flash, jsonify, request, session
 from flaskRegister import app, db, AMAP_KEY
 from flaskRegister.models import OzingSalesmanUser, Province, City, District
-import requests
+from flaskRegister.forms import SalesmanForm
 
 
 @app.route('/', methods=['GET', 'POST'])
-#@app.route('/salesman/register', methods=['GET', 'POST'])
-def salesman_register():
-    submit_result = session.get('submit_result')
-    if submit_result is None:
-        submit_result = 0
-    else:
-        session.pop('submit_result')
-
-    if request.method == 'GET':
-        return render_template('salesmanregister.html', submit_result=submit_result)
-    else:
-        province_id = request.form.get("province")
-        city_id = request.form.get("city")
-        district_id = request.form.get("district")
+def register():
+    form = SalesmanForm()
+    if form.validate_on_submit():
+        session['legend'] = '注册成功，欢迎您'
+        province_id = form.province.data
         province = Province.query.get(province_id).name
+        city_id = form.city.data
         city = City.query.get(city_id).name
+        district_id = form.district.data
         district = District.query.get(district_id).name
-        endpoint = request.form.get("endpoint")
-        phonenumber = request.form.get("phonenumber")
-        name = request.form.get("name")
-        gender_id = request.form.get("gender")
-        if gender_id == '1':
-            gender = '女'
-        elif gender_id == '2':
-            gender = '男'
-        wechat_id = request.form.get("weichatid")
-        s = OzingSalesmanUser.query.filter_by(salesman_phone=phonenumber).first()
-        if s is None:
-            salesman = OzingSalesmanUser(province=province, city=city, district=district, endpoint=endpoint, \
-                            salesman_phone=phonenumber, salesman_name=name, sex=gender, wx_id=wechat_id)
-            db.session.add(salesman)
-            db.session.commit()
-            session['submit_result'] = 100
-        else:
-            session['submit_result'] = 200
-        return redirect(url_for('salesman_register'))
+        endpoint = form.endpoint.data
+        name = form.name.data
+        phonenumber = form.phonenumber.data
+        gender_id = form.gender.data
+        gender = '女' if gender_id == '1' else '男'
+        weichat_id = form.weichat_id.data
+        salesman = OzingSalesmanUser(province=province, city=city, district=district, endpoint=endpoint, \
+                                     salesman_phone=phonenumber, salesman_name=name, sex=gender, wx_id=weichat_id)
+        db.session.add(salesman)
+        db.session.commit()
+        return redirect(url_for('register'))
+    if session.get('legend') is not None:
+        legend = session.get('legend')
+    else:
+        legend = '欢迎注册'
+
+    if legend == '注册成功，欢迎您':
+        s = OzingSalesmanUser.query.filter_by(salesman_phone=session['phone']).first()
+        if s is not None:
+            form.province.choices = [(10000, s.province)]
+            form.city.choices = [(10000, s.city)]
+            form.district.choices = [(10000, s.district)]
+            form.endpoint.data = s.endpoint
+            form.name.data = s.salesman_name
+            form.phonenumber.data = s.salesman_phone
+            form.gender.choices = [(10000, s.sex)]
+            if s.wx_id == '':
+                form.weichat_id.data = ' '
+            else:
+                form.weichat_id.data = s.wx_id
+        session['phone'] = None
+        session['valid_code'] = None
+        session['legend'] = None
+    return render_template('new.html', legend=legend, form=form)
 
         #return render_template('registerconfirm.html')
 
 
 @app.route('/provinces/', methods=['GET'])
 def provinces():
-    provinces = [{'id': "", 'name': '请选择省'}]
+    provinces = [{'id': 0, 'name': '请选择省'}]
     province_all = Province.query.all()
     for province in province_all:
         provinces.append({'id': province.id, 'name': province.name})
@@ -60,14 +69,14 @@ def regions():
     province_id = request.args.get('province')
     city_id = request.args.get('city')
     if province_id is not None:
-        cities = [{'id': "", 'name': '请选择市'}]
+        cities = [{'id': 0, 'name': '请选择市'}]
         p = Province.query.get(province_id)
         for city in p.cities:
             cities.append({'id': city.id, 'name': city.name})
         return jsonify(cities)
 
     if city_id is not None:
-        districts = [{'id': "", 'name': '请选择区/县'}]
+        districts = [{'id': 0, 'name': '请选择区/县'}]
         c = City.query.get(city_id)
         for district in c.districts:
             districts.append({'id': district.id, 'name': district.name})
@@ -77,6 +86,11 @@ def regions():
 @app.route('/validcode/')
 def validcode():
     phone = request.args.get('phone')
+    salesman = OzingSalesmanUser.query.filter_by(salesman_phone=phone).first()
+    if salesman is not None:
+        return jsonify({'code': 1001})  # 1001 phone is occupied
+    else:
+        session['phone'] = phone
     payload = {'mobile': phone, 'type': 'register'}
     r = requests.post('http://boss.hjx.com/ozing/timer/user/fetchAuthCode', data=payload)
     result = r.json()
@@ -85,9 +99,10 @@ def validcode():
         valid_code = result['jsessionid']
         #print('validcode@@@@{}'.format(valid_code))
         session['valid_code'] = valid_code
-        return jsonify(True)
+        return jsonify({'code': 1000})  # 1000 every thing is ok
     else:
-        return jsonify(False)
+        return jsonify({'code': 1002})  # 1002 validcode send fail
+
 
 # Check whether the input code is the same as the one sent to phone
 @app.route('/code/<string:code>/validate/')

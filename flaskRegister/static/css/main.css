@@ -17,14 +17,14 @@ body {
         text-align: center;
     }
 
-    #sendshortmessage{
+    #sendcode{
         background-color: #ff8740;
         margin-right: 2px;
         border: none;
         padding-left: 1px;
         padding-right: 1px;
     }
-    .form-row{
+/*    .form-row{
         margin-right: 2px;
     }
     .error{
@@ -32,21 +32,8 @@ body {
         margin-top: .25rem;
         font-size: 80%;
         color: #dc3545;
-    }
+    }*/
 
-    .modal-content{
-        background: #efefef;
-        /*color: #ff5f00;*/
-        font-size: 120%;
-
-    }
-
-    #closemodal {
-        background-color: #ff5f00;
-        border: none;
-        color: white;
-        text-align: center;
-    }
    /* body,button, form, input, select {
         font-family: Microsoft YaHei,'宋体' , Tahoma, Helvetica, Arial, "\5b8b\4f53", sans-serif;
     }
