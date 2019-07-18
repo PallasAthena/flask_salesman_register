@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+    body {
+      background: #FFA773;
+    }
+    .container-page {
+      width: 95%;
+      margin: 1.7rem auto;
+      background: #efefef;
+      padding: 2rem .5rem 1rem .5rem;
+      -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+      box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+    }
+
+    .table-font-size{
+        font-size: .9rem;
+    }
+
+    .table{
+        width: 99%;
+    }
+
+
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-page">
+        <h3> 共售出 {{ sold_products|length }} 件 </h3>
+        <br>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">手机号码</span>
+            </div>
+            <input id="phone" type="text" class="form-control" value={{ query_input.phone }} readonly="readonly">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">开始日期</span>
+            </div>
+            <input id="startDate" type="text" class="form-control" value={{ query_input.start_date }} readonly="readonly">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">结束日期</span>
+            </div>
+            <input id="endDate" type="text" class="form-control" value={{ query_input.end_date }} readonly="readonly">
+        </div>
+
+
+
+    {% if sold_products|length > 0 %}
+
+        <div class="table-responsive">
+            <table class="table table-striped table-sm table-font-size">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>序列号</th>
+                        <th>日期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in sold_products %}
+                        <tr>
+                            <th>{{ loop.index }}</th>
+                            <th>{{ product.device_number }}</th>
+                            <th>{{ product.create_time }}</th>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+
+    {% endif %}
+
+</div>
+
+
+
+{% endblock %}
+{% block script %}
+    <script>
+
+    $(function () {
+        if ($('.navbar-nav.mr-auto').find('li.active').find('a').text() != "查询"){
+            $('.navbar-nav.mr-auto').find('li.active').removeClass('active');
+            $('[href="/sold_items/"]').parent('li').addClass('active');
+        }
+
+    });
+
+    </script>
+
+{% endblock %}
+

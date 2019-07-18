@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 import requests
+import datetime
 from flask import render_template, redirect, url_for, flash, jsonify, request, session
 from flaskRegister import app, db, AMAP_KEY
-from flaskRegister.models import OzingSalesmanUser, Province, City, District
-from flaskRegister.forms import SalesmanForm
+from flaskRegister.models import OzingSalesmanUser, Province, City, District, SalesmanSoldProduct, ValidSoldProduct
+from flaskRegister.forms import SalesmanForm, SoldItemQueryForm
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -50,7 +51,7 @@ def register():
         session['phone'] = None
         session['valid_code'] = None
         session['legend'] = None
-    return render_template('new.html', legend=legend, form=form)
+    return render_template('register.html', title='注册', legend=legend, form=form)
 
         #return render_template('registerconfirm.html')
 
@@ -86,12 +87,17 @@ def regions():
 @app.route('/validcode/')
 def validcode():
     phone = request.args.get('phone')
+    type = request.args.get('type')
     salesman = OzingSalesmanUser.query.filter_by(salesman_phone=phone).first()
-    if salesman is not None:
+    if type == 'register' and salesman is not None:
         return jsonify({'code': 1001})  # 1001 phone is occupied
+    elif type == 'query' and salesman is  None:
+        return jsonify({'code': 1003})  # 1003 phone is not registered
     else:
         session['phone'] = phone
-    payload = {'mobile': phone, 'type': 'register'}
+
+    payload = {'mobile': phone, 'type': 'register' if type == 'register' else 'general'}
+
     r = requests.post('http://boss.hjx.com/ozing/timer/user/fetchAuthCode', data=payload)
     result = r.json()
     print('')
@@ -178,5 +184,26 @@ def insert_regions():
 def refresh_regions():
     insert_regions()
     return jsonify(True)
+
+
+@app.route('/sold_items/', methods=['GET', 'POST'])
+def sold_items():
+    form = SoldItemQueryForm()
+    query_input = {}
+    if form.validate_on_submit():
+        phone = form.phonenumber.data
+        start_date = datetime.datetime.strptime(str(form.startDate.data) + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+        end_date = datetime.datetime.strptime(str(form.endDate.data) + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+        query_input['phone'] = phone
+        query_input['start_date'] = start_date
+        query_input['end_date'] = end_date
+        salesman = OzingSalesmanUser.query.filter_by(salesman_phone=phone).first()
+        sold_products = list(filter(lambda x : x.create_time <= end_date and x.create_time >= start_date, \
+                               salesman.sold_products.all()))
+        session['phone'] = None
+        session['valid_code'] = None
+        return render_template('sold_items.html', title='查询', sold_products=sold_products, query_input=query_input )
+    return render_template('sold_item_query.html', title='查询', form=form)
+
 
 

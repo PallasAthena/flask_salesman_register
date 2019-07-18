@@ -12,6 +12,7 @@ class OzingSalesmanUser(db.Model):
     endpoint = db.Column(db.VARCHAR(255))
     sex = db.Column(db.VARCHAR(2))
     wx_id = db.Column(db.VARCHAR(255))
+    sold_products = db.relationship('ValidSoldProduct', backref='salesman', lazy='dynamic')
 
     def __repr__(self):
         return f'<OzingSalesmanUser: {self.salesman_name} - {self.salesman_phone}>'
@@ -51,4 +52,23 @@ class District(db.Model):
         return f'<Province: {self.name}>'
 
 
+class SalesmanSoldProduct(db.Model):
+    __tablename__ = 'ozing_salesman_cust_mac'
+    salesman_cust_mac_id = db.Column(db.Integer, primary_key=True)
+    is_valid = db.Column(db.VARCHAR(2))
+
+    __mapper_args__ = {
+        'polymorphic_on': is_valid
+    }
+
+
+
+class ValidSoldProduct(SalesmanSoldProduct):
+    device_number = db.Column(db.VARCHAR(255))
+    create_time = db.Column(db.DateTime)
+    salesman_id = db.Column(db.Integer, db.ForeignKey('ozing_salesman_user.salesman_id'))
+
+    __mapper_args__ = {
+        'polymorphic_identity': '1'
+    }
 

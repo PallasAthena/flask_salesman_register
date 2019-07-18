@@ -5,7 +5,7 @@
       background: #FFA773;
     }
     form {
-      width: 90%;
+      width: 95%;
       margin: 30px auto;
       background: #efefef;
       padding: 30px 20px 30px 20px;
@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block content %}
-    <form id="registerForm" action="" method="post" novalidate>
+    <form id="registerForm" action="" method="post" >
         {{ form.hidden_tag() }}
         <legend> {{ legend }} </legend>
         <fieldset class="form-group">
@@ -166,6 +166,11 @@
     <script>
     $(function () {
 
+        if ($('.navbar-nav.mr-auto').find('li.active').find('a').text() != "注册"){
+            $('.navbar-nav.mr-auto').find('li.active').removeClass('active');
+            $('[href="/"]').parent('li').addClass('active');
+        }
+
         if ($('legend').text() == ' 注册成功，欢迎您 ') {
             $('.col-5').hide();
             $('#submit').hide();
@@ -265,15 +270,15 @@
                 $('#phonenumber .invalid-feedback').remove();
 
                 var url = "{{ url_for('validcode') }}";
-                $.get(url, {phone:phonenumber}, function (data) {
-                    console.log('datadata' + data);
-                    console.log('data——code' + data['code']);
+                $.get(url, {phone:phonenumber, type:'register'}, function (data) {
                     if (data['code'] == 1001){
                         $('#phonenumber').addClass("is-invalid");
                         $('.col-7').append("<div class=\"invalid-feedback\">&ensp;此手机号已经注册</div>");
                     }
+                    else if (data['code'] == 1000){
+                        countdown();
+                    }
                 });
-                countdown();
 
             }
 

@@ -8,9 +8,14 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css" >
     <link rel="stylesheet" type="text/css" href="../static/css/main.css" >
+    <link rel="stylesheet" type="text/css" href="../static/css/jquery-ui.css" >
 
 
-      <title>欢迎注册</title>
+      <title>好记星销售 | {{ title }}</title>
+    <style>
+
+    </style>
+
 
       {% block head %}{% endblock %}
 
@@ -18,13 +23,28 @@
   </head>
   <body>
 
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">
-          <img src="../static/ozing.png"  alt="好记星">
-      </a>
+      <a class="navbar-brand" href="/"><img src="../static/ozing.png"  alt="好记星"></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item ">
+            <a class="nav-link" href="/">注册</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sold_items/">查询</a>
+          </li>
+        </ul>
+      </div>
     </nav>
+
+
     <main role="main" class="container">
-        <div id="flash_message">
+            <div id="flash_message">
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -47,6 +67,15 @@
     <script src="../static/js/jquery.min.js" ></script>
     <script src="../static/js/popper.min.js" ></script>
     <script src="../static/js/bootstrap.min.js" ></script>
+    <script src="../static/js/jquery_ui.js" ></script>
+    {#<script>
+        $('.nav-item a').on('click', function () {
+            $('.navbar-nav.mr-auto').find('li.active').removeClass('active');
+            $(this).parent('li').addClass('active');
+            });
+
+    </script>#}
+
   {% block script %}
   {% endblock %}
 

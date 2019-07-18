@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField
+from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, ValidationError, InputRequired
 from flask import session
 from flaskRegister.models import OzingSalesmanUser, Province, City, District
+
 
 
 class SalesmanForm(FlaskForm):
@@ -45,5 +46,32 @@ class SalesmanForm(FlaskForm):
             raise ValidationError('验证码错误，请检查验证码')
 
 
+class SoldItemQueryForm(FlaskForm):
+    phonenumber = StringField('手机号码', validators=[InputRequired('请输入电话号码')])
+    validcode = StringField('验证码', validators=[InputRequired('请输入验证码')])
+    startDate = DateField('开始日期', format='%Y-%m-%d', validators=[InputRequired('请输入开始日期')])
+    endDate = DateField('结束日期', format='%Y-%m-%d', validators=[InputRequired('请输入结束日期')])
+    submit = SubmitField('提交')
+
+    def validate_phonenumber(self, phonenumber):
+        salesman = OzingSalesmanUser.query.filter_by(salesman_phone=phonenumber.data).first()
+        if salesman is None:
+            raise ValidationError('此手机号还没有注册')
+
+    def validate_startDate(self, startDate):
+        if self.endDate.data <= startDate.data:
+            raise ValidationError('开始日期必须小于结束日期')
+
+    def validate_endDate(self, endDate):
+        if endDate.data <= self.startDate.data:
+            raise ValidationError('结束日期必须大于开始日期')
+
+    def validate_validcode(self, validcode):
+        print(f'session_phone={session.get("phone")}')
+        print(f'phonenumber={self.phonenumber.data}')
+        print(f'session_valid_code={session.get("valid_code")}')
+        print(f'valid_code={validcode.data}')
+        if session.get('valid_code') != validcode.data or session.get('phone') != self.phonenumber.data:
+            raise ValidationError('验证码错误，请检查验证码')
 
 
