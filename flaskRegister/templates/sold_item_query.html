@@ -70,7 +70,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    {{ form.startDate(class='form-control datepicker', placeholder="请选择开始日期", data-select="date") }}
+                    {{ form.startDate(class='form-control datepicker', placeholder="请选择开始日期") }}
                 {% endif %}
             </div>
             <div class="form-group">
@@ -83,7 +83,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    {{ form.endDate(class='form-control datepicker', placeholder="请选择结束日期", data-select="date") }}
+                    {{ form.endDate(class='form-control datepicker', placeholder="请选择结束日期") }}
                 {% endif %}
             </div>
         </fieldset>
@@ -101,12 +101,12 @@
 
     $(function () {
 
-    {#    $('#startDate').datepicker({
+        $('#startDate').datepicker({
             dateFormat: "yy-mm-dd"
         });
         $('#endDate').datepicker({
             dateFormat: "yy-mm-dd"
-        });#}
+        });
 
         if ($('.navbar-nav.mr-auto').find('li.active').find('a').text() != "查询"){
             $('.navbar-nav.mr-auto').find('li.active').removeClass('active');
